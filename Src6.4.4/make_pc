@@ -1,0 +1,37 @@
+#!/bin/sh
+# SPIN - Verification Software - Version 6.4 - December 2014
+#
+# Tool documentation: http://spinroot.com/
+# bug-reports: bugs@spinroot.com            
+
+# This script is for compiling Spin on a PC with a Unix-like shell
+# It requires cygwin to be installed on your system, with:
+#	sh, gcc, yacc, echo, mv, and rm
+#	use of the Visual C++ compiler (cl) is not recommended
+# See also makefile for compiling Spin on a standard Unix/Linux system.
+
+yacc -v -d spin.y
+
+if true
+then	# on PC with standard gcc -- under cygwin produces a 32-bit executable:
+	gcc -O2 -DPC -DNXT -Wall -ansi -o spin.exe *.c
+else
+	# Visual Studio for a standalone compilation
+	PATH="/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 10.0/Common7/IDE/:/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 10.0/VC/BIN:$PATH"
+	CFLAGS="-O2 -DPC -DNXT -D_CONSOLE -Zp4 -nologo -wd4996 -Fespin.exe"
+
+	# 32 bit compilation:
+	cl -DWIN32 $CFLAGS *.c \
+		"-IC:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/INCLUDE" \
+		"C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/LIB/libcmt.lib" \
+		"C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/LIB/oldnames.lib" \
+		"C:/Program Files (x86)/Microsoft Visual Studio 10.0/VC/LIB/libcpmt.lib" \
+		"C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/lib/kernel32.lib"
+fi
+
+rm -f *.o *.obj
+rm -f y?tab.? y.output
+
+# install in the usual place on cygwin:
+echo "mv spin.exe /usr/bin"
+mv spin.exe /usr/bin
